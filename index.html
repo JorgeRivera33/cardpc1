@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+	<meta charset="UTF-8">
+	<title>Document</title>
+	<!--Moviles-->
+	<meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=yes, maximum-scale=3, minimum-scale=1">
+	<!--Jquery-->
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+	<script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
+	<script src="//cdn.jsdelivr.net/npm/phaser@3.50.0/dist/phaser.min.js"></script>
+	<!--Style-->
+	<style type="text/css">
+		*{margin:0; padding:0; box-sizing:border-box;}
+	</style>
+</head>
+<body>
+	<script type="text/javascript">
+		var config = {
+            type: Phaser.AUTO,
+            width: 731,
+            height: 411,
+            scale:{
+                mode: Phaser.Scale.FIT,
+               // parent: 'juego',
+                autoCenter: Phaser.Scale.CENTER_BOTH
+            },
+            physics: {
+                default: 'arcade',
+                arcade: {
+                    gravity: { y: 0 },
+                    debug: false
+                }
+            },
+            input:{
+                activePointers:3
+            },
+             scene: {
+                preload: preload,
+                create: create,
+                update: update
+            }
+        };
+
+        var game = new Phaser.Game(config);
+        var array = [];
+        var press = [];
+        var pside = [];
+        var space1 = "";
+        var space2 = "";
+        var active=true;
+        var big=false;
+        var parejas=0;
+
+        function preload(){
+        	this.load.image('fondo', 'img/fondo3.jpg');
+        	this.load.image('side1', 'img/side1.png');
+        	this.load.image('card1', 'img/card1.png');
+        	this.load.image('card2', 'img/card2.png');
+        	this.load.image('card3', 'img/card3.png');
+        	this.load.image('card4', 'img/card4.png');
+        	this.load.image('card5', 'img/card5.png');
+        	this.load.image('card6', 'img/card6.png');
+        	this.load.image('card7', 'img/card7.png');
+        	this.load.image('card8', 'img/card8.png');
+        }
+        function create(){
+        	this.fondo = this.add.sprite(0,0, 'fondo').setOrigin(0,0);
+        	crearArrayCartas(this);
+        	crearEstructura(this);        	
+        }
+
+        function crearArrayCartas(a){
+        	for(var i=1;i<=8;i++){
+        		var c=a.add.sprite(-150,-150,'card'+i).setScale(0.28).setInteractive();
+        		c.name='card'+i;
+        		c.on('pointerdown',function(event){
+        			if(big){
+        				//setTimeout(function(){
+        					this.visible=false;
+        					this.setScale(0.28);
+        					this.x=-150;
+        					for(var i=0;i<pside.length;i++){
+			                	var d=pside[i].alpha=1;
+			                }
+			                active=true;
+			                big=false;
+        				//},1000);
+        			}
+        		});
+        		array.push(c);
+        		var d=a.add.sprite(-150,-150,'card'+i).setScale(0.28).setInteractive();
+        		d.name='card'+i;
+        		d.on('pointerdown',function(event){
+        			if(big){
+        				//setTimeout(function(){
+        					this.visible=false;
+        					this.setScale(0.28);
+        					this.x=-150;
+        					for(var i=0;i<pside.length;i++){
+			                	var d=pside[i].alpha=1;
+			                }
+			                active=true;
+			                big=false;
+        				//},1000);
+        			}
+        		});
+        		array.push(d);
+        	}
+        	array=array.sort(function(){return Math.random()-0.5});
+        	//console.log(array);
+        }
+
+    	function crearEstructura(a){
+    		var px=150;
+    		var py=90;
+    		for(var i=0;i<16;i++){
+    			
+    			var obj=a.add.sprite(px,py,'side1').setScale(0.28).setInteractive();
+    			obj.name=i;
+    			pside.push(obj);
+
+    			obj.on('pointerdown', function (event) {
+    				if(active){
+	    				press.push(this);
+	    				var b=array[Number(this.name)];
+			            //console.log(Number(this.name));
+			            b.x=this.x;
+			            b.y=this.y;
+			            this.visible=false;
+			            if(space1===""){
+			                	space1=b;
+			            }else{
+			                	active=false;
+			                	console.log(b.name+"-->"+space1.name);
+			                	if(b.name===space1.name){
+			                		setTimeout(function(){
+			                			b.visible=false;
+			                			//space1.visible=false;
+			                			for(var i=0;i<pside.length;i++){
+			                				var d=pside[i].alpha=0.5;
+			                			}
+
+			                			space1.setScale(0.8);
+			                			space1.setDepth(10);
+			                			space1.x=355;
+			                			space1.y=210;
+
+			                			big=true;
+
+			                			press=new Array();
+			                			space1="";
+			                			parejas++;
+			                			if(parejas===8){
+			                				console.log("termino");
+			                			}else{
+			                				//active=true;
+			                			}
+			                		},2000);
+			                	}else{
+			                		setTimeout(function(){
+			                			press[0].visible=true;
+			                			press[1].visible=true;
+			                			space1.x=-150;
+			                			b.x=-150;
+			                			press=new Array();
+			                			space1="";
+			                			active=true;
+			                		},2000);
+			                	}
+			            }
+    				}
+    						
+    				
+	            });
+    			//console.log(obj);
+    			if(i===5 || i===11){
+    				px=150;
+    				py=py+115;
+    			}else{
+    				px=px+83;
+    			}
+    		}
+    	}
+
+        function update(){}
+	</script>
+</body>
+</html>
